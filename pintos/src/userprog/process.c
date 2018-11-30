@@ -350,6 +350,11 @@ static bool validate_segment (const struct Elf32_Phdr *, struct file *);
 static bool load_segment (struct file *file, off_t ofs, uint8_t *upage,
                           uint32_t read_bytes, uint32_t zero_bytes,
                           bool writable);
+static bool
+load_segment_with_pages (struct file *file, off_t ofs, uint8_t *upage,
+                          uint32_t read_bytes, uint32_t zero_bytes,
+                          bool writable);
+
 
 /* Loads an ELF executable from FILE_NAME into the current thread.
    Stores the executable's entry point into *EIP
@@ -528,6 +533,33 @@ validate_segment (const struct Elf32_Phdr *phdr, struct file *file)
 
   /* It's okay. */
   return true;
+}
+
+static bool
+load_segment_with_pages (struct file *file, off_t ofs, uint8_t *upage,
+           uint32_t read_bytes, uint32_t zero_bytes, bool writable)
+{
+   ASSERT ((read_bytes + zero_bytes) % PGSIZE == 0);
+   ASSERT (pg_ofs (upage) == 0);
+   ASSERT (ofs % PGSIZE == 0);
+   //TODO double check all this makes sense
+  while (read_bytes > 0 || zero_bytes > 0)
+    {
+      size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
+      size_t page_zero_bytes = PGSIZE - page_read_bytes;
+
+      if (!suppl_pt_insert_file (file, ofs, upage, page_read_bytes,
+                                 page_zero_bytes, writable))
+	return false;
+  
+      read_bytes -= page_read_bytes;
+      zero_bytes -= page_zero_bytes;
+      ofs += page_read_bytes;
+      upage += PGSIZE;
+    }
+  return true;
+
+
 }
 
 /* Loads a segment starting at offset OFS in FILE at address

@@ -19,6 +19,11 @@ static void free_sp_entry(struct hash_elem *he, void *aux UNUSED);
 unsigned suppl_pt_hash (const struct hash_elem *he, void *aux UNUSED);
 bool suppl_pt_less (const struct hash_elem *hea, const struct hash_elem *heb, void *aux UNUSED);
 
+
+bool
+sp_add_entry (struct file *file, off_t ofs, uint8_t *upage,
+		      uint32_t read_bytes, uint32_t zero_bytes, bool writable);
+
 void vm_page_init (void){
   return;
 }
@@ -71,6 +76,15 @@ bool load_file_page(struct sup_page_entry *spe){
   spe->loaded = true;
   return true;
 
+
+}
+
+
+bool
+sp_add_entry (struct file *file, off_t ofs, uint8_t *upage,
+		      uint32_t read_bytes, uint32_t zero_bytes, bool writable)
+{
+  //TODO properly do this
 
 }
 
