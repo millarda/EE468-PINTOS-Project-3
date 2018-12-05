@@ -599,6 +599,12 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       if (kpage == NULL)
         return false;
 
+
+
+      if (!sp_insert_file (file, ofs, upage, page_read_bytes, page_zero_bytes, writable)){
+        return false;
+      }
+      
       /* Load this page. */
       if (file_read (file, kpage, page_read_bytes) != (int) page_read_bytes)
         {
@@ -614,10 +620,6 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
           vm_free_frame (kpage);
           return false;
         }
-
-      if (!sp_insert_file (file, ofs, upage, page_read_bytes, page_zero_bytes, writable)){
-        return false;
-      }
       /* Advance. */
       read_bytes -= page_read_bytes;
       zero_bytes -= page_zero_bytes;
