@@ -101,7 +101,7 @@ static void free_sp_entry(struct hash_elem *he, void *aux UNUSED){
   free(spe);
 }
 
-/* Add an file suplemental page entry to supplemental page table */
+/* Add a file suplemental page entry to supplemental page table */
 bool sp_insert_file (struct file *file, off_t ofs, uint8_t *upage,
 		      uint32_t read_bytes, uint32_t zero_bytes, bool writable)
 {

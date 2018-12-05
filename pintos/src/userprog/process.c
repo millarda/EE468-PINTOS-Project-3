@@ -608,16 +608,20 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       memset (kpage + page_read_bytes, 0, page_zero_bytes);
 
       /* Add the page to the process's address space. */
-      //if (!install_page (upage, kpage, writable))
-      if(!sp_insert_file (file, ofs, upage, page_read_bytes, page_zero_bytes, writable))
+      //if(!sp_insert_file (file, ofs, upage, page_read_bytes, page_zero_bytes, writable))
+      if (!install_page (upage, kpage, writable))
         {
           vm_free_frame (kpage);
           return false;
         }
 
+      if (!sp_insert_file (file, ofs, upage, page_read_bytes, page_zero_bytes, writable)){
+        return false;
+      }
       /* Advance. */
       read_bytes -= page_read_bytes;
       zero_bytes -= page_zero_bytes;
+      ofs += page_read_bytes;
       upage += PGSIZE;
     }
   return true;
