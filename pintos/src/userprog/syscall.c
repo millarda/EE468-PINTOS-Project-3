@@ -459,6 +459,10 @@ int sys_read(int fd, const void *buffer, unsigned size)
 
   /* check the user memory pointing by buffer are valid */
   //maybe remove this
+
+  struct thread *t = thread_current ();
+  unsigned buffer_size = size;
+  void * buffer_tmp = buffer;
   while (buffer_tmp != NULL)
     {
       if (!is_valid_ptr (buffer_tmp))
