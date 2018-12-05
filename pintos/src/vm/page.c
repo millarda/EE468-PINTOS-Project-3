@@ -101,7 +101,35 @@ static void free_sp_entry(struct hash_elem *he, void *aux UNUSED){
   free(spe);
 }
 
+/* Add an file suplemental page entry to supplemental page table */
+bool sp_insert_file (struct file *file, off_t ofs, uint8_t *upage,
+		      uint32_t read_bytes, uint32_t zero_bytes, bool writable)
+{
+  struct sup_page_entry *spte;
+  struct hash_elem *result;
+  struct thread *cur = thread_current ();
 
+  spte = calloc (1, sizeof *spte);
+
+  if (spte == NULL)
+    return false;
+
+  spte->user_vaddr = upage;
+  spte->type = FILE;
+  spte->data.file = file;
+  spte->data.offset = ofs;
+  spte->data.read_bytes = read_bytes;
+  spte->data.zero_bytes = zero_bytes;
+  spte->data.writable = writable;
+  spte->loaded = false;
+
+  result = hash_insert (&cur->suppl_page_table, &spte->elem);
+  if (result != NULL)
+    return false;
+
+  return true;
+
+}
 /* needed since sp is a hash*/
 unsigned suppl_pt_hash (const struct hash_elem *he, void *aux UNUSED)
 {

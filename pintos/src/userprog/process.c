@@ -460,7 +460,7 @@ load (const char *cmdline, void (**eip) (void), void **esp)
                   read_bytes = 0;
                   zero_bytes = ROUND_UP (page_offset + phdr.p_memsz, PGSIZE);
                 }
-              if (!load_segment (file, file_page, (void *) mem_page,
+              if (!load_segment_with_pages (file, file_page, (void *) mem_page,
                                  read_bytes, zero_bytes, writable))
                 goto done;
             }
@@ -548,10 +548,11 @@ load_segment_with_pages (struct file *file, off_t ofs, uint8_t *upage,
       size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
       size_t page_zero_bytes = PGSIZE - page_read_bytes;
 
-      if (!suppl_pt_insert_file (file, ofs, upage, page_read_bytes,
+      //this returns false if the file is already located in the page table
+      if (!sp_insert_file (file, ofs, upage, page_read_bytes,
                                  page_zero_bytes, writable))
 	return false;
-  
+
       read_bytes -= page_read_bytes;
       zero_bytes -= page_zero_bytes;
       ofs += page_read_bytes;

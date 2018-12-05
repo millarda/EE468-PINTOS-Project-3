@@ -22,6 +22,7 @@ struct spe_data{
   //!TODO complete this
 };
 
+//supplemental page table entry
 struct sup_page_entry{
   void *user_vaddr;
   enum spe_type type;
