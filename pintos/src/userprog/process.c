@@ -606,12 +606,12 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       }
 
       /* Load this page. */
-      // if (file_read (file, kpage, page_read_bytes) != (int) page_read_bytes)
-      //   {
-      //     vm_free_frame (kpage);
-      //     return false;
-      //   }
-      // memset (kpage + page_read_bytes, 0, page_zero_bytes);
+      if (file_read (file, kpage, page_read_bytes) != (int) page_read_bytes)
+        {
+          vm_free_frame (kpage);
+          return false;
+        }
+      memset (kpage + page_read_bytes, 0, page_zero_bytes);
 
       /* Add the page to the process's address space. */
       //if(!sp_insert_file (file, ofs, upage, page_read_bytes, page_zero_bytes, writable))
