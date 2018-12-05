@@ -473,7 +473,7 @@ int sys_read(int fd, const void *buffer, unsigned size)
 	  struct suppl_pte *spte;
 	  spte = get_spe (&t->suppl_page_table,
 				pg_round_down (buffer_tmp));
-	  if (spte != NULL && !spte->is_loaded)
+	  if (spte != NULL && !spte->loaded)
 	    load_page (spte);
 	  else
 	    exit (-1);
