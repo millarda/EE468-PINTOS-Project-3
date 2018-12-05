@@ -456,6 +456,44 @@ int sys_read(int fd, const void *buffer, unsigned size)
   struct file_descriptor *fd_struct;
   int bytes_written = 0;
 
+
+  /* check the user memory pointing by buffer are valid */
+  //maybe remove this
+  while (buffer_tmp != NULL)
+    {
+      if (!is_valid_ptr (buffer_tmp))
+	exit (-1);
+
+      if (pagedir_get_page (t->pagedir, buffer_tmp) == NULL)
+	{
+	  struct suppl_pte *spte;
+	  spte = get_spe (&t->suppl_page_table,
+				pg_round_down (buffer_tmp));
+	  if (spte != NULL && !spte->is_loaded)
+	    load_page (spte);
+	  else
+	    exit (-1);
+	}
+
+      /* Advance */
+      if (buffer_size == 0)
+	{
+	  /* terminate the checking loop */
+	  buffer_tmp = NULL;
+	}
+      else if (buffer_size > PGSIZE)
+	{
+	  buffer_tmp += PGSIZE;
+	  buffer_size -= PGSIZE;
+	}
+      else
+	{
+	  /* last loop */
+	  buffer_tmp = buffer + size - 1;
+	  buffer_size = 0;
+	}
+    }
+
   lock_acquire(&filesys_lock);
 
   if(fd == STDOUT_FILENO) {
